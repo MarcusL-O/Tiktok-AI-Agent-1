@@ -9,4 +9,4 @@ def create_video(image_path, audio_path, output_path="assets/output/final.mp4"):
     final_clip = image_clip.set_audio(audio_clip)
     final_clip.write_videofile(output_path, fps=24)
 
-    print("✅ Video skapad:", output_path)
+    print("Video skapad:", output_path)
