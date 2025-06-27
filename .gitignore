@@ -1,0 +1,40 @@
+# 🐍 Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# 📦 Virtuell miljö
+venv/
+ENV/
+env/
+.venv/
+
+# 📝 Logs och tillfälliga filer
+*.log
+*.tmp
+*.temp
+*.bak
+
+# 🔒 Miljövariabler
+.env
+
+# 📁 PyInstaller
+*.spec
+dist/
+build/
+
+# 📸 Genererade filer
+assets/audio/
+assets/output/
+assets/video/
+assets/images/generated/
+
+# 🧠 VS Code inställningar
+.vscode/
+*.code-workspace
+
+# 💻 OS-filer
+.DS_Store
+Thumbs.db
