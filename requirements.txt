@@ -1,6 +1,5 @@
 openai
 requests
 moviepy==1.0.3
-pyttsx3
 pillow==9.5.0
 python-dotenv

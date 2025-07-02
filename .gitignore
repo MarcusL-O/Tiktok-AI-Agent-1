@@ -6,10 +6,10 @@ __pycache__/
 *.pdb
 
 # 📦 Virtuell miljö
+.venv/
 venv/
 ENV/
 env/
-.venv/
 
 # 📝 Logs och tillfälliga filer
 *.log
@@ -20,21 +20,22 @@ env/
 # 🔒 Miljövariabler
 .env
 
-# 📁 PyInstaller
+# 🛠 PyInstaller / builds
 *.spec
 dist/
 build/
 
-# 📸 Genererade filer
+# 🎬 Genererade mediafiler
 assets/audio/
 assets/output/
+assets/images/
 assets/video/
-assets/images/generated/
+assets/music/
 
-# 🧠 VS Code inställningar
+# 🧠 VS Code
 .vscode/
 *.code-workspace
 
-# 💻 OS-filer
+# 💻 OS-specifika
 .DS_Store
 Thumbs.db

@@ -1,28 +1,40 @@
+"""
+generate_script.py – Genererar ett kort Gen Z-inspirerat manus från ett ämne (prompt).
+Delar upp manuset i scener med överdrivna, absurda repliker som passar TikTok-stil.
+Returnerar en lista med manusrader, en per scen.
+"""
+
+import openai
 import os
-from openai import OpenAI
-from dotenv import load_dotenv
 
-load_dotenv()
+# Hämta API-nyckel från .env
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-def generate_script(topic: str) -> str:
+def generate_script(topic, project_id):
     prompt = f"""
-    Write a short, viral TikTok script in English (max 80 words) about: "{topic}".
-    
-    Style:
-    - Gen Z humor
-    - Random, exaggerated reactions
-    - Meme references or viral phrases (e.g. “bro thinks he’s him”, “this ain’t no ballerina cappuccino”, “nah cause why is it kinda slay”)
-    - End with a punchline or ironic twist
-    """
+You're a Gen Z TikTok scriptwriter. Write a short viral skit (max 5 lines)
+about this topic: "{topic}"
 
-    response = client.chat.completions.create(
-        model="gpt-4", 
-        messages=[
-        {"role": "system", "content": "You are a humorous Gen Z TikTok script writer specialized in viral videos, Be funny, sarcastic, and internet-aware, Always make it sound like something from the 'For You Page'."},
-        {"role": "user", "content": f"Create a script for a video about: {topic}"}
-        ]
-    )
+Style:
+- Gen Z humor (absurd, over-the-top, sarcastic)
+- Short, snappy scenes
+- Each line is one scene, like: Scene 1: "text"
 
-    return response.choices[0].message.content.strip()
+Return only the script.
+"""
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=1.1,
+            max_tokens=300
+        )
+
+        raw_script = response['choices'][0]['message']['content']
+        lines = [line.strip() for line in raw_script.split("\n") if line.strip() and ":" in line]
+        return lines
+
+    except Exception as e:
+        print(f" Error generating script: {e}")
+        return [f"Scene 1: This is a fallback script because GPT failed for topic: {topic}"]

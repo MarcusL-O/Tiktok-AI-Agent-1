@@ -1,35 +1,54 @@
-import requests
+"""
+text_to_speech.py – Skapar AI-röst (TTS) för varje scenrad i manuset.
+Använder ElevenLabs API. Sparar varje ljudfil i assets/audio/.
+Returnerar en lista med filvägar till röstklippen.
+"""
+
 import os
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def text_to_speech(text, filename="assets/audio/output.mp3"):
-    api_key = os.getenv("ELEVEN_API_KEY")
-    voice_id = "21m00Tcm4TlvDq8ikWAM"  # Rachel – English female
-    # Du kan byta ut voice_id mot en annan röst från Eleven Labs
-    # HÄR KAN DU LÄGGA TILL E ANNAN RÖST 
+ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID")  # Du kan ha flera röster – byt enkelt i .env
 
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+HEADERS = {
+    "xi-api-key": ELEVEN_API_KEY,
+    "Content-Type": "application/json"
+}
 
-    headers = {
-        "xi-api-key": api_key,
-        "Content-Type": "application/json"
-    }
+def generate_voiceover(script_scenes, project_id):
+    audio_paths = []
 
-    payload = {
-        "text": text,
-        "voice_settings": {
-            "stability": 0.5,
-            "similarity_boost": 0.7
-        }
-    }
+    for idx, line in enumerate(script_scenes):
+        try:
+            scene_text = line.split(":", 1)[1].strip()
+            url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
 
-    response = requests.post(url, json=payload, headers=headers)
+            body = {
+                "text": scene_text,
+                "model_id": "eleven_multilingual_v2",
+                "voice_settings": {
+                    "stability": 0.4,
+                    "similarity_boost": 0.75
+                }
+            }
 
-    if response.status_code == 200:
-        with open(filename, "wb") as f:
-            f.write(response.content)
-        print("AI-röst skapad:", filename)
-    else:
-        print(" Något gick fel:", response.text)
+            response = requests.post(url, headers=HEADERS, json=body)
+            if response.status_code != 200:
+                raise Exception(response.text)
+
+            filename = f"{project_id}_scene_{idx+1}.mp3"
+            save_path = os.path.join("assets/audio", filename)
+
+            with open(save_path, 'wb') as f:
+                f.write(response.content)
+
+            print(f"[🎙️] Voiceover saved: {save_path}")
+            audio_paths.append(save_path)
+
+        except Exception as e:
+            print(f"Failed to generate voice for scene {idx+1}: {e}")
+
+    return audio_paths
