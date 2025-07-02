@@ -1,37 +1,48 @@
+"""
+main.py Kontrollerar hela AI-agentens arbetsflöde stegvis.
+
+Flöde:
+1. Läser ett prompt-ämne (kan hårdkodas eller laddas dynamiskt)
+2. Genererar ett Gen Z-manus via OpenAI
+3. Skapar en bild för varje scen
+4. Skapar en AI-röstfil (TTS) för varje scen
+5. Lägger till text-overlay på bilden
+6. Väljer (valfritt) musik
+7. Bygger en färdig video från alla komponenter
+"""
+
 import os
-from datetime import datetime
-
 from scripts.generate_script import generate_script
-from scripts.text_to_speech import text_to_speech
-from scripts.create_video import create_video
-from scripts.generate_images import generate_image, add_text_overlay
+from scripts.generate_images import generate_images_for_script
+from scripts.text_to_speech import generate_voiceover
+from scripts.overlay_text import add_text_to_images
+from scripts.select_music import select_background_music
+from scripts.create_video import create_final_video
+from utils.file_utils import create_output_dirs
 
-# === Steg 0: Sätt upp mappstruktur ===
-topic = "What if cats ruled the world?"
-timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-project_dir = f"projects/video_{timestamp}"
+# 1. Prompt – hårdkodad för test
+topic = "Why Gen Z can't handle silence"  # ← Byt detta för ny video
 
-images_dir = os.path.join(project_dir, "images")
-audio_dir = os.path.join(project_dir, "audio")
-output_path = os.path.join(project_dir, "final.mp4")
+# 2. Skapa mappar för att spara filer
+project_id = topic.replace(" ", "_").lower()
+create_output_dirs(project_id)
 
-os.makedirs(images_dir, exist_ok=True)
-os.makedirs(audio_dir, exist_ok=True)
+# 3. Generera manus
+script_scenes = generate_script(topic, project_id)
 
-# === Steg 1: Generera manus ===
-script = generate_script(topic)
-print("📝 Script:", script)
+# 4. Generera bilder för varje scen i manuset
+image_paths = generate_images_for_script(script_scenes, project_id)
 
-# === Steg 2: Generera bild baserat på manus ===
-image_path = os.path.join(images_dir, "image_0.png")
-generate_image(script, image_path)
+# 5. Skapa röstfiler för varje scen
+audio_paths = generate_voiceover(script_scenes, project_id)
 
-# === Steg 2.5: Lägg till text på bilden ===
-add_text_overlay(image_path, script)
+# 6. Lägg text-overlay (repliken) på varje bild
+add_text_to_images(script_scenes, image_paths, project_id)
 
-# === Steg 3: Konvertera till AI-röst ===
-audio_path = os.path.join(audio_dir, "output.mp3")
-text_to_speech(script, audio_path)
+# 7. Välj bakgrundsmusik (frivilligt)
+music_path = select_background_music(project_id)
 
-# === Steg 4: Skapa video ===
-create_video(image_path, audio_path, output_path)
+# 8. Skapa slutlig video
+create_final_video(image_paths, audio_paths, music_path, project_id)
+
+print(f"\n✅ Klar! Video sparad i: assets/output/{project_id}.mp4")
