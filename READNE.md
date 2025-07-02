@@ -8,10 +8,15 @@ sen när venv. virituella miljön är igång och du fått din video stänger ner
 
 kommer tillbaka dagen efter för att få en ny video behöver du bara köra kommandot 
 
+# steg: 1 source .venv/bin/activate
+
+
 # Steg 2: Aktivera miljön
 source .venv/bin/activate 
 
 detta startar miljö igen och efter det kan du köra: 
+
+pip install -r requirements.txt
 
 # Steg 4: Kör huvudprogram
 python main.py
